@@ -2,8 +2,9 @@
   <div>
     <div
       class="tm-hero d-flex justify-content-center align-items-center"
-      data-parallax="scroll" data-image-src="@/assets/img/hero.jpg">
-     
+      data-parallax="scroll"
+      data-image-src="@/assets/img/hero.jpg"
+    >
       <form class="d-flex tm-search-form">
         <input
           class="form-control tm-search-input"
@@ -20,77 +21,27 @@
       <div class="row mb-4">
         <h2 class="col-2 tm-text-primary">Latest Photos</h2>
         <div class="col-12 d-flex justify-content-end align-items-center">
-          <form action="" class="tm-text-primary">
-            Page
-            <input
-              type="text"
-              value="1"
-              size="1"
-              class="tm-input-paging tm-text-primary"
-            />
-            of 200
-          </form>
+          Page {{ currentPage }} of {{ totalPage }}
         </div>
       </div>
       <div class="row tm-mb-90 tm-gallery">
-        <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 mb-5">
+        <div
+          v-for="(item, index) in items"
+          :key="index"
+          class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 mb-5"
+        >
           <figure class="effect-ming tm-video-item">
-            <img src="@/assets/img/img-03.jpg" alt="Image" class="img-fluid" />
+            <img :src="item.url" alt="Image" class="img-fluid" />
             <figcaption
               class="d-flex align-items-center justify-content-center"
             >
-              <h2>Clocks</h2>
+              <h2>{{ item.name }}</h2>
               <a href="photo-detail">View more</a>
             </figcaption>
           </figure>
           <div class="d-flex justify-content-between tm-text-gray">
-            <span class="tm-text-gray-light">18 Oct 2020</span>
-            <span>9,906 views</span>
-          </div>
-        </div>
-        <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 mb-5">
-          <figure class="effect-ming tm-video-item">
-            <img src="@/assets/img/img-04.jpg" alt="Image" class="img-fluid" />
-            <figcaption
-              class="d-flex align-items-center justify-content-center"
-            >
-              <h2>Plants</h2>
-              <a href="photo-detail">View more</a>
-            </figcaption>
-          </figure>
-          <div class="d-flex justify-content-between tm-text-gray">
-            <span class="tm-text-gray-light">14 Oct 2020</span>
-            <span>16,100 views</span>
-          </div>
-        </div>
-        <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 mb-5">
-          <figure class="effect-ming tm-video-item">
-            <img src="@/assets/img/img-05.jpg" alt="Image" class="img-fluid" />
-            <figcaption
-              class="d-flex align-items-center justify-content-center"
-            >
-              <h2>Morning</h2>
-              <a href="photo-detail">View more</a>
-            </figcaption>
-          </figure>
-          <div class="d-flex justify-content-between tm-text-gray">
-            <span class="tm-text-gray-light">12 Oct 2020</span>
-            <span>12,460 views</span>
-          </div>
-        </div>
-        <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 mb-5">
-          <figure class="effect-ming tm-video-item">
-            <img src="@/assets/img/img-05.jpg" alt="Image" class="img-fluid" />
-            <figcaption
-              class="d-flex align-items-center justify-content-center"
-            >
-              <h2>Morning</h2>
-              <a href="photo-detail">View more</a>
-            </figcaption>
-          </figure>
-          <div class="d-flex justify-content-between tm-text-gray">
-            <span class="tm-text-gray-light">12 Oct 2020</span>
-            <span>12,460 views</span>
+            <span class="tm-text-gray-light">{{ item.createAt }}</span>
+            <span>{{ item.view }} views</span>
           </div>
         </div>
       </div>
@@ -101,16 +52,28 @@
         >
           <a
             href="javascript:void(0);"
-            class="btn btn-primary tm-btn-prev mb-2 disabled"
+            class="btn btn-primary tm-btn-prev mb-2 "
+            :class="{ disabled: currentPage === 1 }"
+            @click="changePage(currentPage - 1)"
             >Previous</a
           >
           <div class="tm-paging d-flex">
-            <a href="javascript:void(0);" class="active tm-paging-link">1</a>
-            <a href="javascript:void(0);" class="tm-paging-link">2</a>
-            <a href="javascript:void(0);" class="tm-paging-link">3</a>
-            <a href="javascript:void(0);" class="tm-paging-link">4</a>
+            <a
+              v-for="page in totalPage"
+              :key="page"
+              href="javascript:void(0);"
+              class="tm-paging-link"
+              :class="{ active: page === currentPage }"
+              @click="changePage(page)"
+            >
+              {{ page }}</a
+            >
           </div>
-          <a href="javascript:void(0);" class="btn btn-primary tm-btn-next"
+          <a
+            href="javascript:void(0);"
+            class="btn btn-primary tm-btn-next"
+            :class="{ disabled: currentPage === totalPage }"
+            @click="changePage(currentPage + 1)"
             >Next Page</a
           >
         </div>
@@ -123,7 +86,49 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
+  data() {
+    return {
+      items: [], // Mảng để lưu trữ các mục được tải từ API
+      currentPage: 1, // Biến để lưu trữ trang hiện tại
+      totalPage: 1,
+    };
+  },
+
+  mounted() {
+    this.loadItems(); // Gọi hàm để tải các mục khi component được mount
+  },
+
+  methods: {
+    async loadItems() {
+      try {
+        const response = await axios.get(
+          `http://localhost:8081/api/image/list?index-page=${this.currentPage}&size=2`
+        ); // Thay 'ĐƯỜNG_DẪN_API_CỦA_BẠN' bằng đường dẫn API thực tế của bạn
+        // Kiểm tra xem response có trường data không
+        if (response.data && response.data.data && response.data.data.content) {
+          this.items = response.data.data.content; // Cập nhật dữ liệu 'items' với dữ liệu nhận được từ API
+          this.totalPage = response.data.data.totalPage;
+        } else {
+          console.error("Response không chứa dữ liệu cần thiết.");
+        }
+      } catch (error) {
+        console.error("Lỗi khi tải các mục:", error);
+      }
+    },
+
+    changePage(newPage) {
+      console.log("page : "+newPage);
+      console.log("cur - page : "+this.currentPage);
+      if (newPage >= 1 && newPage <= this.totalPage) {
+        this.currentPage = newPage;
+        this.loadItems();
+      }
+    },
+  },
+
   name: "HomeView",
 };
 </script>
