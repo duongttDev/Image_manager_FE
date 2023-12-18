@@ -19,10 +19,16 @@
     </div>
     <div class="container-fluid tm-container-content tm-mt-60">
       <div class="row mb-4">
-        <h2 class="col-2 tm-text-primary">Latest Photos</h2>
-        <div class="col-12 d-flex justify-content-end align-items-center">
-          Page {{ currentPage }} of {{ totalPage }}
+        <div class="d-flex justify-content-between">
+          <h2 class="col-2 tm-text-primary">Latest Photos</h2>
+          <a  class="col-2 btn btn-primary w-auto tm-btn-next" href="add">Add</a> 
         </div>
+
+       
+          <div class="col-12 mt-4 d-flex justify-content-end align-items-center">
+            Page {{ currentPage }} of {{ totalPage }}
+          </div>
+        
       </div>
       <div class="row tm-mb-90 tm-gallery">
         <div
@@ -52,7 +58,7 @@
         >
           <a
             href="javascript:void(0);"
-            class="btn btn-primary tm-btn-prev mb-2 "
+            class="btn btn-primary tm-btn-prev mb-2"
             :class="{ disabled: currentPage === 1 }"
             @click="changePage(currentPage - 1)"
             >Previous</a
@@ -120,8 +126,8 @@ export default {
     },
 
     changePage(newPage) {
-      console.log("page : "+newPage);
-      console.log("cur - page : "+this.currentPage);
+      console.log("page : " + newPage);
+      console.log("cur - page : " + this.currentPage);
       if (newPage >= 1 && newPage <= this.totalPage) {
         this.currentPage = newPage;
         this.loadItems();

@@ -6,6 +6,7 @@ import Home from '../views/Home.vue'
 import PhotoView from   '../views/Photo-Detail.vue'
 import VideoDetailView from '../views/Video-Detail.vue'
 import ContactView from '../views/Contact.vue'
+import Add from '../views/Add.vue'
 
 const routes = [
     { path: '/about', component: AboutView},
@@ -13,6 +14,7 @@ const routes = [
     { path: '/', component: Home},
     { path: '/photo-detail', component: PhotoView},
     { path: '/video-detail', component: VideoDetailView},
+    { path: '/add', component: Add},
     { path: '/contact', component: ContactView}
 ]
 
