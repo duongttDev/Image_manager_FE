@@ -9,33 +9,18 @@
           <div class="tm-bg-gray tm-video-details">
             <p class="mb-4"></p>
 
-            <form class="tm-search-form">
+            <form class="tm-search-form" @submit.prevent="addImage">
               <label class="mt-4 tm-text-primary">Tên:</label>
-              <input
-                class="form-control"
-                type="text"
-                placeholder="Nhập tên của ảnh"
-                aria-label="Search"
-              />
+              <input class="form-control" type="text" v-model="name" placeholder="Nhập tên của ảnh" aria-label="Search" />
 
               <br />
               <label class="tm-text-primary">Miêu tả:</label>
-              <input
-                class="form-control"
-                type="text"
-                placeholder="Nhập miêu tả"
-                aria-label="Search"
-              />
+              <input class="form-control" type="text" v-model="description" placeholder="Nhập miêu tả"
+                aria-label="Search" />
               <br />
 
               <label class="tm-text-primary">URL của ảnh:</label>
-              <input
-                class="form-control"
-                type="text"
-                v-model="url"
-                placeholder="Nhập url của ảnh"
-                aria-label="Search"
-              />
+              <input class="form-control" type="text" v-model="url" placeholder="Nhập url của ảnh" aria-label="Search" />
               <br />
 
               <!-- Chỗ hiển thị thông tin ảnh -->
@@ -50,10 +35,7 @@
                 </div>
               </div>
 
-              <button
-                class="btn btn-outline-success tm-search-btn"
-                type="submit"
-              >
+              <button class="btn btn-outline-success tm-search-btn" type="submit">
                 Thêm mới
               </button>
               <br /><br /><br />
@@ -62,12 +44,7 @@
         </div>
 
         <div class="col-xl-8 col-lg-7 col-md-6 col-sm-12">
-          <img
-            :src="url"
-            alt="Hãy chèn link vào để hiển thị ảnh"
-            style="border: 3px dashed red"
-            class="img-fluid w-50"
-          />
+          <img :src="url" alt="Hãy chèn link vào để hiển thị ảnh" style="border: 3px dashed red" class="img-fluid w-50" />
         </div>
       </div>
     </div>
@@ -75,6 +52,7 @@
 </template>
 
 <script>
+import axios from "axios";
 export default {
   name: "AddView",
   data() {
@@ -101,6 +79,32 @@ export default {
       };
       img.src = this.url;
     },
+
+    addImage() {
+      const data = {
+        name: this.name,
+        description: this.description,
+        url: this.url,
+        size: this.imageInfo.dimension,
+        format: this.imageInfo.format
+      };
+
+      const urlApi = 'http://localhost:8081/api/image/add';
+
+      axios.put(urlApi, data).then(response => {
+        alert(response.data.message);
+        if(response.data.code == 200) {
+          window.location.href = '/'; 
+        }
+        console.log(response.data);
+      })
+        .catch(error => {
+          // Xử lý lỗi nếu có
+          alert(error);
+          console.error("Error adding image:", error);
+        });
+
+    },
   },
   watch: {
     url: "updateImageInfo", // Watch for changes in 'url' and update image info
@@ -108,5 +112,4 @@ export default {
 };
 </script>
 
-<style>
-</style>
+<style></style>
