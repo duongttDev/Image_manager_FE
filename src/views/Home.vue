@@ -12,8 +12,8 @@
     <div class="container-fluid tm-container-content tm-mt-60">
       <div class="row mb-4">
         <div class="d-flex justify-content-between">
-          <h2 class="col-2 tm-text-primary">Danh sách hình ảnh</h2>
-          <a class="col-2 btn btn-primary w-auto tm-btn-next" href="add">Thêm mới</a>
+          <h2 class=" tm-text-primary">Danh sách hình ảnh</h2>
+          <a class=" btn btn-primary  tm-btn-next" href="add">Thêm mới</a>
         </div>
 
         <div class="col-12 mt-4 d-flex justify-content-end align-items-center">
@@ -72,10 +72,23 @@ export default {
   methods: {
     async loadItems() {
       try {
+        //lấy token 
+        const token = sessionStorage.getItem('token');
+
+        if(!token){
+          alert("bạn chưa đăng nhập");
+          return;
+        }
+
+
         const response = await axios.get(
-          `http://localhost:8081/api/image/list?index-page=${this.currentPage}&size=6`
-        ); // Thay 'ĐƯỜNG_DẪN_API_CỦA_BẠN' bằng đường dẫn API thực tế của bạn
-        // Kiểm tra xem response có trường data không
+          `http://localhost:8081/api/image/list?index-page=${this.currentPage}&size=6`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
         if (response.data && response.data.data && response.data.data.content) {
           this.items = response.data.data.content; // Cập nhật dữ liệu 'items' với dữ liệu nhận được từ API
           this.totalPage = response.data.data.totalPage;
