@@ -7,7 +7,7 @@
 				<div class="container">
 					<div class="signup-content">
 						<div class="signup-form">
-							<h2 class="form-title">Đăng ký</h2>
+							<h2 class="form-title">Đăng nhập</h2>
 							<form @submit.prevent="login" class="register-form" id="register-form">
 								<div class="form-group">
 									<label for="name"><i class="zmdi zmdi-account material-icons-name"></i></label>
@@ -65,6 +65,15 @@ export default {
 					password: this.password,
 				});
 				console.log(response)
+				const mess = response.data.message;
+				const code = response.data.code;
+
+				if(code !== 200){
+					this.errorMessage = mess;
+					return;
+				}
+
+				
 
 				// Xử lý response khi đăng nhập thành công
 				const token = response.data.data.token;
@@ -72,7 +81,7 @@ export default {
 				// Lưu token vào localStorage hoặc Vuex để sử dụng sau này
 				sessionStorage.setItem('token', token);
 
-				alert('Đăng nhập thành công');
+				alert(mess);
 				// Redirect hoặc thực hiện các hành động sau khi đăng nhập thành công
 				this.$router.push({ path: 'home' });
 

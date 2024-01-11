@@ -32,10 +32,14 @@ router.beforeEach((to, from, next) => {
     if (to.meta.requiresAuth) {
         const token = sessionStorage.getItem('token');
         console.log(token)
+        console.log('token' + token)
         if (!token) {
             // Chưa đăng nhập, chuyển hướng đến trang login
             next('/login');
         } else {
+            if (token == 'undefined') {
+                next('/login');
+            }
             // Đã đăng nhập, cho phép truy cập trang yêu cầu xác thực
             next();
         }
